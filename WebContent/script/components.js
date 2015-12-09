@@ -25,6 +25,31 @@ Crafty.c('Grid', {
 	}
 });
 
+Crafty.c('Timer', {
+	time : 0,
+	run : true,
+	init : function() {		
+		this.requires('2D, Canvas, Text').attr({ x: 20, y: 20}).text(0).bind('EnterFrame', function(ent){
+			if(ent.frame%60 == 0){
+				if(this.run)
+					this.setTime();
+			}
+			else
+				if(!this.run)
+					this.stopTimer();
+		});
+	},
+	
+	setTime : function() {
+		this.time = this.time + 1;
+		this.text(this.time);
+	},
+	
+	stopTimer : function() {
+		this.run = false;
+	}
+}),
+
 Crafty.c('Actor', {
 	init : function() {
 		this.requires('2D, Canvas, Grid');
@@ -66,6 +91,8 @@ Crafty.c('PlayerCharacterLeft', {
 				this.y += 3;
 			if (this.isDown("DOWN_ARROW"))
 				this.y -= 3;
+		}).onHit('PlayerCharacterRight', function(player){
+			Crafty.stop();
 		});
 	}
 });

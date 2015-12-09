@@ -38,7 +38,10 @@ Game = {
 		Crafty.background('#AAAAAA');
 
 		Crafty.timer.FPS(60);
-				
+		
+		// Timer
+		var timer = Crafty.e('Timer');
+		
 		// Player1 character, placed at 2, 2 on our grid
 	    Crafty.e('PlayerCharacterRight').at(2, 2);
 	    
