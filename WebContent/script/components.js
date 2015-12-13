@@ -1,30 +1,3 @@
-// The Grid component allows an element to be located
-//  on a grid of tiles
-Crafty.c('Grid', {
-	init : function() {
-		this.attr({
-			w : Game.map_grid.tile.width,
-			h : Game.map_grid.tile.height
-		})
-	},
-
-	// Locate this entity at the given position on the grid
-	at : function(x, y) {
-		if (x === undefined && y === undefined) {
-			return {
-				x : this.x / Game.map_grid.tile.width,
-				y : this.y / Game.map_grid.tile.height
-			}
-		} else {
-			this.attr({
-				x : x * Game.map_grid.tile.width,
-				y : y * Game.map_grid.tile.height
-			});
-			return this;
-		}
-	}
-});
-
 Crafty.c('Timer', {
 	time : 0,
 	run : true,
@@ -66,7 +39,11 @@ Crafty.c('Wall', {
 Crafty.c('PlayerCharacterLeft', {
 	init : function() {
 		this.requires('Actor, Color, Collision, Multiway').color(
-				'rgb(20, 75, 40)').bind('EnterFrame', function() {
+				'rgb(20, 75, 40)').attr({
+					w : 16,
+					h : 16,
+					x : 20,
+					y : 20}).bind('EnterFrame', function() {
 			if (this.isDown("LEFT_ARROW"))
 				this.x -= 3;
 			if (this.isDown("RIGHT_ARROW"))
@@ -92,7 +69,7 @@ Crafty.c('PlayerCharacterLeft', {
 			if (this.isDown("DOWN_ARROW"))
 				this.y -= 3;
 		}).onHit('PlayerCharacterRight', function(player){
-			Crafty.stop();
+			loadHighscore();
 		});
 	}
 });
@@ -101,7 +78,11 @@ Crafty.c('PlayerCharacterLeft', {
 Crafty.c('PlayerCharacterRight', {
 	init : function() {
 		this.requires('Actor, Color, Collision, Multiway').color(
-				'rgb(20, 75, 40)').bind('EnterFrame', function() {
+				'rgb(20, 75, 40)').attr({
+					w : 16,
+					h : 16,
+					x : 200,
+					y : 200}).bind('EnterFrame', function() {
 			if (this.isDown("A"))
 				this.x -= 3;
 			if (this.isDown("D"))
