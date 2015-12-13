@@ -1,58 +1,86 @@
+var objectWidth = 16;
+var objectHeight = 16;
+var playerLeftPosX = 30;
+var playerLeftPosY = 200;
+var playerRightPosX = 750;
+var playerRightPosY = 200;
+var movementPoints = 50;
+var speed = 3;
+
 Crafty.c('Timer', {
 	time : 0,
 	run : true,
-	init : function() {		
-		this.requires('2D, Canvas, Text').attr({ x: 20, y: 20}).text(0).bind('EnterFrame', function(ent){
-			if(ent.frame%60 == 0){
-				if(this.run)
-					this.setTime();
-			}
-			else
-				if(!this.run)
-					this.stopTimer();
+	init : function() {
+		this.requires('2D, Canvas, Text').attr({
+			x : 20,
+			y : 20
+		}).text(0).bind('EnterFrame', function(ent) {
+			// if (ent.frame % 60 == 0) {
+			if (this.run) {
+				this.setTime();
+			} else if (!this.run)
+				this.stopTimer();
+		}).textFont({
+			size : '20px',
+			weight : 'bold'
 		});
 	},
-	
+
 	setTime : function() {
-		this.time = this.time + 1;
+		this.time = Math.round((this.time + 0.01) * 1000) / 1000;
 		this.text(this.time);
 	},
-	
+
 	stopTimer : function() {
 		this.run = false;
+	},
+
+	getTime : function() {
+		return this.time;
 	}
 }),
 
 Crafty.c('Actor', {
 	init : function() {
 		this.requires('2D, Canvas, Grid');
-	},
+	}
 });
 
 Crafty.c('Wall', {
 	init : function() {
-		this.requires('Actor, Color, Solid, Particles').color('rgb(50, 50, 50)');
-	},
+		this.requires('Actor, Color, Solid').color('rgb(255, 150, 0)');
+	}
 });
 
 // This is the player-controlled character
 Crafty.c('PlayerCharacterLeft', {
+	movementPoints : movementPoints,
 	init : function() {
 		this.requires('Actor, Color, Collision, Multiway').color(
-				'rgb(20, 75, 40)').attr({
-					w : 16,
-					h : 16,
-					x : 20,
-					y : 20}).bind('EnterFrame', function() {
-			if (this.isDown("LEFT_ARROW"))
-				this.x -= 3;
-			if (this.isDown("RIGHT_ARROW"))
-				this.x += 3;
-			if (this.isDown("UP_ARROW"))
-				this.y -= 3;
-			if (this.isDown("DOWN_ARROW"))
-				this.y += 3;
-
+				'rgb(255, 0, 0)').attr({
+			w : objectWidth,
+			h : objectHeight,
+			x : playerLeftPosX,
+			y : playerLeftPosY
+		}).bind('EnterFrame', function() {
+			if (this.getMovementPoints() > 0) {
+				if (this.isDown("LEFT_ARROW")) {
+					this.x -= speed;
+					this.useMovementPoints();
+				}
+				if (this.isDown("RIGHT_ARROW")) {
+					this.x += speed;
+					this.useMovementPoints();
+				}
+				if (this.isDown("UP_ARROW")) {
+					this.y -= speed;
+					this.useMovementPoints();
+				}
+				if (this.isDown("DOWN_ARROW")) {
+					this.y += speed;
+					this.useMovementPoints();
+				}
+			}
 		}).onHit('Solid', function(ent) {
 
 			if (ent[0].obj.__c.Wall)
@@ -61,37 +89,61 @@ Crafty.c('PlayerCharacterLeft', {
 				console.debug('Solid');
 
 			if (this.isDown("LEFT_ARROW"))
-				this.x += 3;
+				this.x += speed;
 			if (this.isDown("RIGHT_ARROW"))
-				this.x -= 3;
+				this.x -= speed;
 			if (this.isDown("UP_ARROW"))
-				this.y += 3;
+				this.y += speed;
 			if (this.isDown("DOWN_ARROW"))
-				this.y -= 3;
-		}).onHit('PlayerCharacterRight', function(player){
+				this.y -= speed;
+		}).onHit('PlayerCharacterRight', function(player) {
 			loadHighscore();
 		});
+	},
+
+	useMovementPoints : function() {
+		Crafty("PlayerCharacterRight").addMovementPoints();
+		this.movementPoints -= 1;
+	},
+
+	getMovementPoints : function() {
+		return this.movementPoints;
+	},
+
+	addMovementPoints : function() {
+		this.movementPoints += 1;
 	}
 });
 
-//This is the player-controlled character
+// This is the player-controlled character
 Crafty.c('PlayerCharacterRight', {
+	movementPoints : movementPoints,
 	init : function() {
-		this.requires('Actor, Color, Collision, Multiway').color(
-				'rgb(20, 75, 40)').attr({
-					w : 16,
-					h : 16,
-					x : 200,
-					y : 200}).bind('EnterFrame', function() {
-			if (this.isDown("A"))
-				this.x -= 3;
-			if (this.isDown("D"))
-				this.x += 3;
-			if (this.isDown("W"))
-				this.y -= 3;
-			if (this.isDown("S"))
-				this.y += 3;
-
+		this.requires('Actor, Color, Collision, Multiway, PlayerGlow').color(
+				'rgb(0, 40, 255)').attr({
+			w : objectWidth,
+			h : objectHeight,
+			x : playerRightPosX,
+			y : playerRightPosY
+		}).bind('EnterFrame', function() {
+			if (this.getMovementPoints() > 0) {
+				if (this.isDown("A")) {
+					this.x -= speed;
+					this.useMovementPoints();
+				}
+				if (this.isDown("D")) {
+					this.x += speed;
+					this.useMovementPoints();
+				}
+				if (this.isDown("W")) {
+					this.y -= speed;
+					this.useMovementPoints();
+				}
+				if (this.isDown("S")) {
+					this.y += speed;
+					this.useMovementPoints();
+				}
+			}
 		}).onHit('Solid', function(ent) {
 			if (ent[0].obj.__c.Wall)
 				console.debug('Wall');
@@ -99,13 +151,27 @@ Crafty.c('PlayerCharacterRight', {
 				console.debug('Solid');
 
 			if (this.isDown("A"))
-				this.x += 3;
+				this.x += speed;
 			if (this.isDown("D"))
-				this.x -= 3;
+				this.x -= speed;
 			if (this.isDown("W"))
-				this.y += 3;
+				this.y += speed;
 			if (this.isDown("S"))
-				this.y -= 3;
+				this.y -= speed;
 		});
+	},
+
+	useMovementPoints : function() {
+		Crafty("PlayerCharacterLeft").addMovementPoints();
+		this.movementPoints -= 1;
+	},
+
+	getMovementPoints : function() {
+		return this.movementPoints;
+	},
+
+	addMovementPoints : function() {
+		this.movementPoints += 1;
 	}
+
 });

@@ -1,19 +1,17 @@
-/**
- * 
- */
-
 var screenWidth = 800;
 var screenHeight = 400;
+var obstacles = 100;
+var timer;
 
 Crafty.init(screenWidth, screenHeight, document.getElementById("game"));
 
 Crafty.background('#FFFFFF');
 
 Crafty.defineScene("game", function() {
-	Crafty.background("#AAAAAA");
-	Crafty.timer.FPS(60);
+	Crafty.background("#FFFFFF");
+	Crafty.timer.FPS(100);
 
-	Crafty.e('Timer');
+	timer = Crafty.e('Timer');
 
 	// Add characters
 	Crafty.e('PlayerCharacterRight');
@@ -33,18 +31,31 @@ Crafty.defineScene("game", function() {
 			}
 		}
 	}
+
+	// Create obstacles
+	for (var x = 0; x < obstacles; x++) {
+		Crafty.e('Wall').attr({
+			w : 16,
+			h : 16,
+			x : 100 + Math.floor((Math.random() * (screenWidth - 200)) + 1),
+			y : 20 + Math.floor((Math.random() * (screenHeight - 50)) + 1)
+		});
+	}
 });
 
 Crafty.defineScene("highscore", function() {
 	Crafty.background("#FFFFFF");
 	Crafty.e("2D, DOM, Text").attr({
-		w : 100,
-		h : 20,
-		x : ((screenWidth / 2) - 85),
+		w : 300,
+		h : 200,
+		x : ((screenWidth / 2) - 150),
 		y : ((screenHeight / 2) - 30),
-	}).text("HighScore").css({
+	}).text("TIME : " + timer.getTime()).css({
 		"text-align" : "center"
-	}).textColor("#000000");
+	}).textColor("#000000").textFont({
+		size : '40px',
+		weight : 'bold'
+	});
 });
 
 loadScene("game", 1500);
@@ -60,7 +71,9 @@ function loadScene(scene, duration) {
 		alpha : 1.0
 	}, duration).bind("TweenEnd", function() {
 		this.unbind("TweenEnd");
-		this.tween({alpha: 0.0}, duration).bind("TweenEnd", function() {
+		this.tween({
+			alpha : 0.0
+		}, duration).bind("TweenEnd", function() {
 			Crafty.enterScene(scene);
 		});
 	});
