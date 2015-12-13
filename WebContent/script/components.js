@@ -48,7 +48,7 @@ Crafty.c('Actor', {
 
 Crafty.c('Wall', {
 	init : function() {
-		this.requires('Actor, Color, Solid').color('rgb(255, 150, 0)');
+		this.requires('Actor, Color, Solid').color('rgb(255, 165, 0)');
 	}
 });
 

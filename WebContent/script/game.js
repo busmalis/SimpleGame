@@ -1,6 +1,6 @@
 var screenWidth = 800;
 var screenHeight = 400;
-var obstacles = 100;
+var obstacles = 30;
 var timer;
 
 Crafty.init(screenWidth, screenHeight, document.getElementById("game"));
@@ -38,7 +38,27 @@ Crafty.defineScene("game", function() {
 			w : 16,
 			h : 16,
 			x : 100 + Math.floor((Math.random() * (screenWidth - 200)) + 1),
-			y : 20 + Math.floor((Math.random() * (screenHeight - 50)) + 1)
+			y : 20 + Math.floor((Math.random() * (screenHeight/3)) + 1)
+		});
+	}
+	
+	// Create obstacles
+	for (var x = 0; x < obstacles; x++) {
+		Crafty.e('Wall').attr({
+			w : 16,
+			h : 16,
+			x : 100 + Math.floor((Math.random() * (screenWidth - 200)) + 1),
+			y : 100 + Math.floor((Math.random() * (screenHeight/3)) + 1)
+		});
+	}
+	
+	// Create obstacles
+	for (var x = 0; x < obstacles; x++) {
+		Crafty.e('Wall').attr({
+			w : 16,
+			h : 16,
+			x : 100 + Math.floor((Math.random() * (screenWidth - 200)) + 1),
+			y : 230 + Math.floor((Math.random() * (screenHeight/3)) + 1)
 		});
 	}
 });

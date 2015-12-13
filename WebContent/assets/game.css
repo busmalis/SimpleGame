@@ -1,13 +1,45 @@
 body {
-	background-color: black;
+	background: url(bg-body.jpg) top left repeat;
+	color: white;
+}
+
+a {
+	color: orange;
+}
+
+#contentWrapper {
+	width: 800px;
+	height: 400px;
+	margin-top: 50px;
+	margin-left: 25%;
+	background-color: white;
 }
 
 #gameWrapper {
-	width: 900px;
-	height: 500px;
-	margin: auto;
+	
 }
 
 #game {
-	top: 50px;
+	margin-top: 50px;
+	margin: auto;
+	box-shadow: 0px 0px 30px 20px rgba(0, 0, 0, 0.5)	
+}
+
+#infoWrapper {
+	margin-top: 50px;
+	height: 400px;
+	font-family: monospace;
+}
+
+#info {
+	
+}
+
+.gitHub, .craftyJS {
+	text-decoration: none;
+	cursor: auto;
+}
+
+a:hover {
+	opacity: 0.6;
 }
