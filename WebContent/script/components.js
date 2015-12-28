@@ -47,9 +47,24 @@ Crafty.c('MenuStart', {
 					x : 100,
 					h : 30,
 					x : 200,
-					y : 150
+					y : 100
 				}).text("START").textFont({
-					size : '20px',
+					size : '40px',
+					weight : 'bold'
+				});
+	}
+});
+
+Crafty.c('MenuHighscore', {
+	init : function() {
+		this.requires('2D, Canvas, Color, Text').color('rgb(255, 255, 0)')
+				.attr({
+					x : 100,
+					h : 30,
+					x : 200,
+					y : 150
+				}).text("HIGHSCORE").textFont({
+					size : '40px',
 					weight : 'bold'
 				});
 	}
@@ -115,6 +130,8 @@ Crafty.c('PlayerCharacterLeft', {
 			loadHighscore();
 		}).onHit('MenuStart', function() {
 			startGame();
+		}).onHit('MenuHighscore', function() {
+			loadHighscore();
 		});
 	},
 
@@ -177,6 +194,8 @@ Crafty.c('PlayerCharacterRight', {
 				this.y -= speed;
 		}).onHit('MenuStart', function() {
 			startGame();
+		}).onHit('MenuHighscore', function() {
+			loadHighscore();
 		});
 	},
 

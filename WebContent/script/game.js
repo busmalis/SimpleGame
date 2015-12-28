@@ -3,6 +3,7 @@ var screenHeight = 400;
 var obstacles = 30;
 var currentScene;
 var timer;
+var bestTime;
 
 Crafty.init(screenWidth, screenHeight, document.getElementById("game"));
 
@@ -11,6 +12,11 @@ Crafty.background('#FFFFFF');
 Crafty.defineScene("menu", function() {
 	currentScene = "menu";
 	Crafty.background("#FFFFFF");
+
+	// Get Storage values
+	bestTime = Crafty.storage('bestTime');
+	if (!bestTime)
+		bestTime = "No Record found!";
 
 	// Add characters
 	Crafty.e('PlayerCharacterRight');
@@ -30,12 +36,12 @@ Crafty.defineScene("menu", function() {
 			}
 		}
 	}
-	
-	// HighScore
-	
+
 	// Start
 	Crafty.e('MenuStart');
-	
+
+	// HighScore
+	Crafty.e('MenuHighscore');
 });
 
 Crafty.defineScene("game", function() {
@@ -70,40 +76,55 @@ Crafty.defineScene("game", function() {
 			w : 16,
 			h : 16,
 			x : 100 + Math.floor((Math.random() * (screenWidth - 200)) + 1),
-			y : 20 + Math.floor((Math.random() * (screenHeight/3)) + 1)
+			y : 20 + Math.floor((Math.random() * (screenHeight / 3)) + 1)
 		});
 	}
-	
+
 	// Create obstacles
 	for (var x = 0; x < obstacles; x++) {
 		Crafty.e('Wall').attr({
 			w : 16,
 			h : 16,
 			x : 100 + Math.floor((Math.random() * (screenWidth - 200)) + 1),
-			y : 100 + Math.floor((Math.random() * (screenHeight/3)) + 1)
+			y : 100 + Math.floor((Math.random() * (screenHeight / 3)) + 1)
 		});
 	}
-	
+
 	// Create obstacles
 	for (var x = 0; x < obstacles; x++) {
 		Crafty.e('Wall').attr({
 			w : 16,
 			h : 16,
 			x : 100 + Math.floor((Math.random() * (screenWidth - 200)) + 1),
-			y : 230 + Math.floor((Math.random() * (screenHeight/3)) + 1)
+			y : 230 + Math.floor((Math.random() * (screenHeight / 3)) + 1)
 		});
 	}
 });
 
-Crafty.defineScene("highscore", function() {
+Crafty.defineScene("highscore", function(time) {
 	currentScene = "hightscore";
 	Crafty.background("#FFFFFF");
+
+	if (getNewRecord(time)) {
+		Crafty.e("2D, DOM, Text").attr({
+			w : 300,
+			h : 200,
+			x : ((screenWidth / 2) - 150),
+			y : ((screenHeight / 3) - 30),
+		}).text("NEW RECORD!").css({
+			"text-align" : "center"
+		}).textColor("#000000").textFont({
+			size : '40px',
+			weight : 'bold'
+		});
+	}
+
 	Crafty.e("2D, DOM, Text").attr({
 		w : 300,
 		h : 200,
 		x : ((screenWidth / 2) - 150),
 		y : ((screenHeight / 2) - 30),
-	}).text("TIME : " + timer.getTime()).css({
+	}).text("TIME : " + time).css({
 		"text-align" : "center"
 	}).textColor("#000000").textFont({
 		size : '40px',
@@ -111,7 +132,7 @@ Crafty.defineScene("highscore", function() {
 	});
 });
 
-loadScene("menu", 1500);
+loadScene("menu", 500);
 
 function loadScene(scene, duration) {
 	Crafty.e("2D, Canvas, Tween, Color, Image").attr({
@@ -133,10 +154,25 @@ function loadScene(scene, duration) {
 }
 
 function loadHighscore() {
-	if(currentScene == "game")
-		Crafty.enterScene('highscore');
+
+	var time = bestTime;
+	
+	if (currentScene == "game") {
+		if (bestTime >= timer.getTime()) {
+			time = timer.getTime();
+		}
+	}
+
+	Crafty.enterScene('highscore', time);
 }
 
-function startGame(){
+function startGame() {
 	Crafty.enterScene('game');
+}
+
+function getNewRecord(time){
+	if(time < bestTime)
+		return true;
+	else
+		return false;
 }
