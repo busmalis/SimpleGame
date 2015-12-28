@@ -16,7 +16,7 @@ Crafty.defineScene("menu", function() {
 	// Get Storage values
 	bestTime = Crafty.storage('bestTime');
 	if (!bestTime)
-		bestTime = "No Record found!";
+		bestTime = "1000";
 
 	// Add characters
 	Crafty.e('PlayerCharacterRight');
@@ -42,6 +42,7 @@ Crafty.defineScene("menu", function() {
 
 	// HighScore
 	Crafty.e('MenuHighscore');
+
 });
 
 Crafty.defineScene("game", function() {
@@ -104,6 +105,9 @@ Crafty.defineScene("game", function() {
 Crafty.defineScene("highscore", function(time) {
 	currentScene = "hightscore";
 	Crafty.background("#FFFFFF");
+	
+	// Continue 
+	Crafty.e('RibbonContinue');
 
 	if (getNewRecord(time)) {
 		Crafty.e("2D, DOM, Text").attr({
@@ -129,6 +133,9 @@ Crafty.defineScene("highscore", function(time) {
 	}).textColor("#000000").textFont({
 		size : '40px',
 		weight : 'bold'
+	}).bind('KeyDown', function(e){
+		if(e.key == 67) // "C"	
+			Crafty.enterScene('menu');
 	});
 });
 
@@ -160,6 +167,7 @@ function loadHighscore() {
 	if (currentScene == "game") {
 		if (bestTime >= timer.getTime()) {
 			time = timer.getTime();
+			Crafty.storage('bestTime', time);
 		}
 	}
 

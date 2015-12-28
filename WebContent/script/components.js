@@ -40,11 +40,26 @@ Crafty.c('Timer', {
 	}
 }),
 
+Crafty.c('RibbonContinue', {
+	init : function() {
+		this.requires('2D, Canvas, Color, Text').color('rgb(20, 50, 255)')
+				.attr({
+					w : 100,
+					h : 30,
+					x : 20,
+					y : screenHeight - 100
+				}).text("PRESS C TO CONTINUE").textFont({
+					size : '40px',
+					weight : 'bold'
+				});
+	}
+});
+
 Crafty.c('MenuStart', {
 	init : function() {
 		this.requires('2D, Canvas, Color, Text').color('rgb(255, 255, 0)')
 				.attr({
-					x : 100,
+					w : 100,
 					h : 30,
 					x : 200,
 					y : 100
@@ -59,7 +74,7 @@ Crafty.c('MenuHighscore', {
 	init : function() {
 		this.requires('2D, Canvas, Color, Text').color('rgb(255, 255, 0)')
 				.attr({
-					x : 100,
+					w : 100,
 					h : 30,
 					x : 200,
 					y : 150
