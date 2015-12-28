@@ -1,13 +1,45 @@
 var screenWidth = 800;
 var screenHeight = 400;
 var obstacles = 30;
+var currentScene;
 var timer;
 
 Crafty.init(screenWidth, screenHeight, document.getElementById("game"));
 
 Crafty.background('#FFFFFF');
 
+Crafty.defineScene("menu", function() {
+	currentScene = "menu";
+	Crafty.background("#FFFFFF");
+
+	// Add characters
+	Crafty.e('PlayerCharacterRight');
+	Crafty.e('PlayerCharacterLeft');
+
+	// Create border
+	for (var x = 0; x < screenWidth; x++) {
+		for (var y = 0; y < screenHeight; y++) {
+			if (x == 0 || x == screenWidth - 16 || y == 0
+					|| y == screenHeight - 16) {
+				Crafty.e('Wall').attr({
+					w : 16,
+					h : 16,
+					x : x,
+					y : y
+				});
+			}
+		}
+	}
+	
+	// HighScore
+	
+	// Start
+	Crafty.e('MenuStart');
+	
+});
+
 Crafty.defineScene("game", function() {
+	currentScene = "game";
 	Crafty.background("#FFFFFF");
 	Crafty.timer.FPS(100);
 
@@ -64,6 +96,7 @@ Crafty.defineScene("game", function() {
 });
 
 Crafty.defineScene("highscore", function() {
+	currentScene = "hightscore";
 	Crafty.background("#FFFFFF");
 	Crafty.e("2D, DOM, Text").attr({
 		w : 300,
@@ -78,7 +111,7 @@ Crafty.defineScene("highscore", function() {
 	});
 });
 
-loadScene("game", 1500);
+loadScene("menu", 1500);
 
 function loadScene(scene, duration) {
 	Crafty.e("2D, Canvas, Tween, Color, Image").attr({
@@ -100,5 +133,10 @@ function loadScene(scene, duration) {
 }
 
 function loadHighscore() {
-	Crafty.enterScene('highscore');
+	if(currentScene == "game")
+		Crafty.enterScene('highscore');
+}
+
+function startGame(){
+	Crafty.enterScene('game');
 }

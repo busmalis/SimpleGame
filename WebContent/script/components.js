@@ -40,6 +40,21 @@ Crafty.c('Timer', {
 	}
 }),
 
+Crafty.c('MenuStart', {
+	init : function() {
+		this.requires('2D, Canvas, Color, Text').color('rgb(255, 255, 0)')
+				.attr({
+					x : 100,
+					h : 30,
+					x : 200,
+					y : 150
+				}).text("START").textFont({
+					size : '20px',
+					weight : 'bold'
+				});
+	}
+});
+
 Crafty.c('Actor', {
 	init : function() {
 		this.requires('2D, Canvas, Grid');
@@ -96,8 +111,10 @@ Crafty.c('PlayerCharacterLeft', {
 				this.y += speed;
 			if (this.isDown("DOWN_ARROW"))
 				this.y -= speed;
-		}).onHit('PlayerCharacterRight', function(player) {
+		}).onHit('PlayerCharacterRight', function() {
 			loadHighscore();
+		}).onHit('MenuStart', function() {
+			startGame();
 		});
 	},
 
@@ -158,6 +175,8 @@ Crafty.c('PlayerCharacterRight', {
 				this.y += speed;
 			if (this.isDown("S"))
 				this.y -= speed;
+		}).onHit('MenuStart', function() {
+			startGame();
 		});
 	},
 
