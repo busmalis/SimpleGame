@@ -104,6 +104,7 @@ Crafty.c('Wall', {
 // This is the player-controlled character
 Crafty.c('PlayerCharacterLeft', {
 	movementPoints : movementPoints,
+	enabled : false,
 	init : function() {
 		this.requires('Actor, Color, Collision, Multiway').color(
 				'rgb(255, 0, 0)').attr({
@@ -112,7 +113,8 @@ Crafty.c('PlayerCharacterLeft', {
 			x : playerLeftPosX,
 			y : playerLeftPosY
 		}).bind('EnterFrame', function() {
-			if (this.getMovementPoints() > 0) {
+			if (this.getMovementPoints() > 0 && this.enabled) {
+				
 				if (this.isDown("LEFT_ARROW")) {
 					this.x -= speed;
 					this.useMovementPoints();
@@ -129,9 +131,9 @@ Crafty.c('PlayerCharacterLeft', {
 					this.y += speed;
 					this.useMovementPoints();
 				}
+				
 			}
-		}).onHit('Solid', function(ent) {
-
+		}).onHit('Solid', function(ent) {			
 			if (ent[0].obj.__c.Wall)
 				console.debug('Wall');
 			else
@@ -146,7 +148,8 @@ Crafty.c('PlayerCharacterLeft', {
 			if (this.isDown("DOWN_ARROW"))
 				this.y -= speed;
 		}).onHit('PlayerCharacterRight', function() {
-			loadHighscore();
+			if(currentScene == 'game')
+				loadHighscore();
 		}).onHit('MenuStart', function() {
 			startGame();
 		}).onHit('MenuHighscore', function() {
@@ -165,12 +168,17 @@ Crafty.c('PlayerCharacterLeft', {
 
 	addMovementPoints : function() {
 		this.movementPoints += 1;
+	},
+	
+	setEnabled : function(enabled) {
+		this.enabled = enabled;
 	}
 });
 
 // This is the player-controlled character
 Crafty.c('PlayerCharacterRight', {
 	movementPoints : movementPoints,
+	enabled : false,
 	init : function() {
 		this.requires('Actor, Color, Collision, Multiway').color(
 				'rgb(0, 40, 255)').attr({
@@ -179,10 +187,13 @@ Crafty.c('PlayerCharacterRight', {
 			x : playerRightPosX,
 			y : playerRightPosY
 		}).bind('EnterFrame', function() {
-			if (this.getMovementPoints() > 0) {
+			if (this.getMovementPoints() > 0 && this.enabled) {		
+
+				this.isMovementOK = false;
+				
 				if (this.isDown("A")) {
 					this.x -= speed;
-					this.useMovementPoints();
+					this.useMovementPoints();					
 				}
 				if (this.isDown("D")) {
 					this.x += speed;
@@ -197,7 +208,7 @@ Crafty.c('PlayerCharacterRight', {
 					this.useMovementPoints();
 				}
 			}
-		}).onHit('Solid', function(ent) {
+		}).onHit('Solid', function(ent) {			
 			if (ent[0].obj.__c.Wall)
 				console.debug('Wall');
 			else
@@ -229,6 +240,10 @@ Crafty.c('PlayerCharacterRight', {
 
 	addMovementPoints : function() {
 		this.movementPoints += 1;
+	},
+	
+	setEnabled : function(enabled) {
+		this.enabled = enabled;
 	}
 
 });

@@ -6,6 +6,8 @@ var timer;
 var bestTime;
 var currentTime;
 var newRecord;
+var playerRight;
+var playerLeft;
 
 Crafty.init(screenWidth, screenHeight, document.getElementById("game"));
 
@@ -14,18 +16,16 @@ Crafty.background('#FFFFFF');
 Crafty.defineScene("menu", function() {
 	currentScene = "menu";
 	Crafty.background("#FFFFFF");
-
+	
 	// Get Storage values
-	//Crafty.storage.remove('bestTime');
+	// Crafty.storage.remove('bestTime');
 	bestTime = Crafty.storage('bestTime');
 	if (!bestTime)
 		bestTime = "1000";
-	
-	currentTime = 1000;
 
 	// Add characters
-	Crafty.e('PlayerCharacterRight');
-	Crafty.e('PlayerCharacterLeft');
+	Crafty.e('PlayerCharacterRight').setEnabled(true);
+	Crafty.e('PlayerCharacterLeft').setEnabled(true);
 
 	// Create border
 	for (var x = 0; x < screenWidth; x++) {
@@ -58,9 +58,9 @@ Crafty.defineScene("game", function() {
 	timer = Crafty.e('Timer');
 
 	// Add characters
-	Crafty.e('PlayerCharacterRight');
-	Crafty.e('PlayerCharacterLeft');
-
+	playerRight = Crafty.e('PlayerCharacterRight');
+	playerLeft = Crafty.e('PlayerCharacterLeft');
+	
 	// Create border
 	for (var x = 0; x < screenWidth; x++) {
 		for (var y = 0; y < screenHeight; y++) {
@@ -105,8 +105,88 @@ Crafty.defineScene("game", function() {
 			y : 230 + Math.floor((Math.random() * (screenHeight / 3)) + 1)
 		});
 	}
-	
-	timer.startTimer();
+
+	Crafty.e("2D, DOM, Canvas, Tween, Text").attr({
+		alpha : 0.0,
+		x : ((screenWidth / 2) - 85),
+		y : ((screenHeight / 2) - 30),
+		w : 170,
+		h : 60
+	}).text("3").css({
+		"text-align" : "center"
+	}).textColor("#000000").textFont({
+		size : '80px',
+		weight : 'bold'
+	}).tween({
+		alpha : 1.0
+	}, 500).bind("TweenEnd", function() {
+		this.unbind("TweenEnd");
+		this.tween({
+			alpha : 0.0
+		}, 500).bind("TweenEnd", function() {
+			Crafty.e("2D, DOM, Canvas, Tween, Text").attr({
+				alpha : 0.0,
+				x : ((screenWidth / 2) - 85),
+				y : ((screenHeight / 2) - 30),
+				w : 170,
+				h : 60
+			}).text("2").css({
+				"text-align" : "center"
+			}).textColor("#000000").textFont({
+				size : '80px',
+				weight : 'bold'
+			}).tween({
+				alpha : 1.0
+			}, 500).bind("TweenEnd", function() {
+				this.unbind("TweenEnd");
+				this.tween({
+					alpha : 0.0
+				}, 500).bind("TweenEnd", function() {
+					Crafty.e("2D, DOM, Canvas, Tween, Text").attr({
+						alpha : 0.0,
+						x : ((screenWidth / 2) - 85),
+						y : ((screenHeight / 2) - 30),
+						w : 170,
+						h : 60
+					}).text("1").css({
+						"text-align" : "center"
+					}).textColor("#000000").textFont({
+						size : '80px',
+						weight : 'bold'
+					}).tween({
+						alpha : 1.0
+					}, 500).bind("TweenEnd", function() {
+						this.unbind("TweenEnd");
+						this.tween({
+							alpha : 0.0
+						}, 500).bind("TweenEnd", function() {
+							Crafty.e("2D, DOM, Canvas, Tween, Text").attr({
+								alpha : 0.0,
+								x : ((screenWidth / 2) - 200),
+								y : ((screenHeight / 2) - 30),
+								w : 170,
+								h : 60
+							}).text("START").css({
+								"text-align" : "center"
+							}).textColor("#000000").textFont({
+								size : '80px',
+								weight : 'bold'
+							}).tween({
+								alpha : 1.0
+							}, 500).bind("TweenEnd", function() {
+								this.unbind("TweenEnd");
+								this.tween({
+									alpha : 0.0
+								}, 500).bind("TweenEnd", function() {
+									start();
+								});
+							})
+						});
+					})
+				});
+			})
+		});
+	});
 });
 
 Crafty.defineScene("highscore", function() {
@@ -117,19 +197,19 @@ Crafty.defineScene("highscore", function() {
 	Crafty.e('RibbonContinue');
 
 	// CURRENT TIME
-	if(currentTime){
+	if (currentTime) {
 		Crafty.e("2D, DOM, Text").attr({
 			w : screenWidth,
 			h : 50,
 			x : 0,
 			y : ((screenHeight / 2) - 50),
-		}).text("LAST TIME: " + currentTime).css({
+		}).text("TIME: " + currentTime).css({
 			"text-align" : "center"
 		}).textColor("#000000").textFont({
 			size : '20px',
 			weight : 'bold'
 		});
-		
+
 		// RECORD
 		if (getNewRecord()) {
 			Crafty.e("2D, DOM, Text").attr({
@@ -145,7 +225,7 @@ Crafty.defineScene("highscore", function() {
 			});
 		}
 	}
-	
+
 	Crafty.e("2D, DOM, Text").attr({
 		w : screenWidth,
 		h : 50,
@@ -185,7 +265,7 @@ function loadScene(scene, duration) {
 			});
 		});
 		break;
-		
+
 	default:
 		Crafty.e("2D, Canvas, Tween, Color").attr({
 			alpha : 0.0,
@@ -197,24 +277,20 @@ function loadScene(scene, duration) {
 			alpha : 1.0
 		}, duration).bind("TweenEnd", function() {
 			Crafty.enterScene(scene);
-			Crafty.e("2D, Canvas, Tween, Color").attr({
-				alpha : 1.0,
-				x : 0,
-				y : 0,
-				w : screenWidth,
-				h : screenHeight
-			}).color("#000000").tween({
-				alpha : 0.0
-			}, duration);
+			/*
+			 * Crafty.e("2D, Canvas, Tween, Color").attr({ alpha : 1.0, x : 0, y :
+			 * 0, w : screenWidth, h : screenHeight }).color("#000000").tween({
+			 * alpha : 0.0 }, duration);
+			 */
 
 		});
 	}
 }
 
 function loadHighscore() {
-
-	oldBestTime = bestTime;
 	
+	currentTime = 0;
+
 	if (currentScene == "game") {
 		timer.stopTimer();
 		currentTime = timer.getTime();
@@ -222,7 +298,7 @@ function loadHighscore() {
 			bestTime = currentTime;
 			Crafty.storage('bestTime', bestTime);
 			newRecord = true;
-		}else{
+		} else {
 			newRecord = false;
 		}
 	}
@@ -236,4 +312,10 @@ function startGame() {
 
 function getNewRecord() {
 	return newRecord;
+}
+
+function start() {
+	timer.startTimer();
+	playerRight.setEnabled(true);
+	playerLeft.setEnabled(true);
 }
