@@ -9,7 +9,7 @@ var speed = 3;
 
 Crafty.c('Timer', {
 	time : 0,
-	run : true,
+	run : false,
 	init : function() {
 		this.requires('2D, Canvas, Text').attr({
 			x : 20,
@@ -33,6 +33,10 @@ Crafty.c('Timer', {
 
 	stopTimer : function() {
 		this.run = false;
+	},
+	
+	startTimer : function() {
+		this.run = true;
 	},
 
 	getTime : function() {
@@ -168,7 +172,7 @@ Crafty.c('PlayerCharacterLeft', {
 Crafty.c('PlayerCharacterRight', {
 	movementPoints : movementPoints,
 	init : function() {
-		this.requires('Actor, Color, Collision, Multiway, PlayerGlow').color(
+		this.requires('Actor, Color, Collision, Multiway').color(
 				'rgb(0, 40, 255)').attr({
 			w : objectWidth,
 			h : objectHeight,

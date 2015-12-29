@@ -4,6 +4,8 @@ var obstacles = 30;
 var currentScene;
 var timer;
 var bestTime;
+var currentTime;
+var newRecord;
 
 Crafty.init(screenWidth, screenHeight, document.getElementById("game"));
 
@@ -14,9 +16,12 @@ Crafty.defineScene("menu", function() {
 	Crafty.background("#FFFFFF");
 
 	// Get Storage values
+	//Crafty.storage.remove('bestTime');
 	bestTime = Crafty.storage('bestTime');
 	if (!bestTime)
 		bestTime = "1000";
+	
+	currentTime = 1000;
 
 	// Add characters
 	Crafty.e('PlayerCharacterRight');
@@ -100,87 +105,135 @@ Crafty.defineScene("game", function() {
 			y : 230 + Math.floor((Math.random() * (screenHeight / 3)) + 1)
 		});
 	}
+	
+	timer.startTimer();
 });
 
-Crafty.defineScene("highscore", function(time) {
+Crafty.defineScene("highscore", function() {
 	currentScene = "hightscore";
 	Crafty.background("#FFFFFF");
-	
-	// Continue 
+
+	// Continue
 	Crafty.e('RibbonContinue');
 
-	if (getNewRecord(time)) {
+	// CURRENT TIME
+	if(currentTime){
 		Crafty.e("2D, DOM, Text").attr({
-			w : 300,
-			h : 200,
-			x : ((screenWidth / 2) - 150),
-			y : ((screenHeight / 3) - 30),
-		}).text("NEW RECORD!").css({
+			w : screenWidth,
+			h : 50,
+			x : 0,
+			y : ((screenHeight / 2) - 50),
+		}).text("LAST TIME: " + currentTime).css({
 			"text-align" : "center"
 		}).textColor("#000000").textFont({
-			size : '40px',
+			size : '20px',
 			weight : 'bold'
 		});
+		
+		// RECORD
+		if (getNewRecord()) {
+			Crafty.e("2D, DOM, Text").attr({
+				w : screenWidth,
+				h : 50,
+				x : 0,
+				y : ((screenHeight / 2) - 100),
+			}).text("NEW RECORD!").css({
+				"text-align" : "center"
+			}).textColor("#000000").textFont({
+				size : '40px',
+				weight : 'bold'
+			});
+		}
 	}
-
+	
 	Crafty.e("2D, DOM, Text").attr({
-		w : 300,
-		h : 200,
-		x : ((screenWidth / 2) - 150),
-		y : ((screenHeight / 2) - 30),
-	}).text("TIME : " + time).css({
+		w : screenWidth,
+		h : 50,
+		x : 0,
+		y : ((screenHeight / 2)),
+	}).text("BEST TIME : " + bestTime).css({
 		"text-align" : "center"
 	}).textColor("#000000").textFont({
 		size : '40px',
 		weight : 'bold'
-	}).bind('KeyDown', function(e){
-		if(e.key == 67) // "C"	
-			Crafty.enterScene('menu');
+	}).bind('KeyDown', function(e) {
+		if (e.key == 67) // "C"
+			loadScene("menu", 500);
 	});
 });
 
-loadScene("menu", 500);
+loadScene("splash", 500);
 
 function loadScene(scene, duration) {
-	Crafty.e("2D, Canvas, Tween, Color, Image").attr({
-		alpha : 0.0,
-		x : ((screenWidth / 2) - 85),
-		y : ((screenHeight / 2) - 30),
-		w : 170,
-		h : 60
-	}).image("assets/text-logo.png", "no-repeat").tween({
-		alpha : 1.0
-	}, duration).bind("TweenEnd", function() {
-		this.unbind("TweenEnd");
-		this.tween({
-			alpha : 0.0
+
+	switch (scene) {
+	case 'splash':
+		Crafty.e("2D, Canvas, Tween, Color, Image").attr({
+			alpha : 0.0,
+			x : ((screenWidth / 2) - 85),
+			y : ((screenHeight / 2) - 30),
+			w : 170,
+			h : 60
+		}).image("assets/text-logo.png", "no-repeat").tween({
+			alpha : 1.0
+		}, duration).bind("TweenEnd", function() {
+			this.unbind("TweenEnd");
+			this.tween({
+				alpha : 0.0
+			}, duration).bind("TweenEnd", function() {
+				Crafty.enterScene('menu');
+			});
+		});
+		break;
+		
+	default:
+		Crafty.e("2D, Canvas, Tween, Color").attr({
+			alpha : 0.0,
+			x : 0,
+			y : 0,
+			w : screenWidth,
+			h : screenHeight
+		}).color("#000000").tween({
+			alpha : 1.0
 		}, duration).bind("TweenEnd", function() {
 			Crafty.enterScene(scene);
+			Crafty.e("2D, Canvas, Tween, Color").attr({
+				alpha : 1.0,
+				x : 0,
+				y : 0,
+				w : screenWidth,
+				h : screenHeight
+			}).color("#000000").tween({
+				alpha : 0.0
+			}, duration);
+
 		});
-	});
+	}
 }
 
 function loadHighscore() {
 
-	var time = bestTime;
+	oldBestTime = bestTime;
 	
 	if (currentScene == "game") {
-		if (bestTime >= timer.getTime()) {
-			time = timer.getTime();
-			Crafty.storage('bestTime', time);
+		timer.stopTimer();
+		currentTime = timer.getTime();
+		if (bestTime >= currentTime) {
+			bestTime = currentTime;
+			Crafty.storage('bestTime', bestTime);
+			newRecord = true;
+		}else{
+			newRecord = false;
 		}
 	}
 
-	Crafty.enterScene('highscore', time);
+	loadScene("highscore", 500);
 }
 
 function startGame() {
-	Crafty.enterScene('game');
+	loadScene("game", 500);
 }
 
-function getNewRecord(time){
-	if(time < bestTime)
-		return true;
-	else
-		return false;
+function getNewRecord() {
+	return newRecord;
 }
