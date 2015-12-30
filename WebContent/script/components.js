@@ -34,7 +34,7 @@ Crafty.c('Timer', {
 	stopTimer : function() {
 		this.run = false;
 	},
-	
+
 	startTimer : function() {
 		this.run = true;
 	},
@@ -53,6 +53,21 @@ Crafty.c('RibbonContinue', {
 					x : 20,
 					y : screenHeight - 100
 				}).text("PRESS C TO CONTINUE").textFont({
+					size : '40px',
+					weight : 'bold'
+				});
+	}
+});
+
+Crafty.c('RibbonResetHighScore', {
+	init : function() {
+		this.requires('2D, Canvas, Color, Text').color('rgb(20, 50, 255)')
+				.attr({
+					w : 100,
+					h : 30,
+					x : 20,
+					y : screenHeight - 50
+				}).text("PRESS R TO RESET HIGHSCORE").textFont({
 					size : '40px',
 					weight : 'bold'
 				});
@@ -114,42 +129,52 @@ Crafty.c('PlayerCharacterLeft', {
 			y : playerLeftPosY
 		}).bind('EnterFrame', function() {
 			if (this.getMovementPoints() > 0 && this.enabled) {
-				
+
 				if (this.isDown("LEFT_ARROW")) {
 					this.x -= speed;
-					this.useMovementPoints();
+					this.useMovementPoints(true);
 				}
 				if (this.isDown("RIGHT_ARROW")) {
 					this.x += speed;
-					this.useMovementPoints();
+					this.useMovementPoints(true);
 				}
 				if (this.isDown("UP_ARROW")) {
 					this.y -= speed;
-					this.useMovementPoints();
+					this.useMovementPoints(true);
 				}
 				if (this.isDown("DOWN_ARROW")) {
 					this.y += speed;
-					this.useMovementPoints();
+					this.useMovementPoints(true);
 				}
-				
+
 			}
-		}).onHit('Solid', function(ent) {			
-			if (ent[0].obj.__c.Wall)
+		}).onHit('Solid', function(ent) {
+			/*if (ent[0].obj.__c.Wall)
 				console.debug('Wall');
 			else
 				console.debug('Solid');
-
-			if (this.isDown("LEFT_ARROW"))
+			 */
+			if (this.isDown("LEFT_ARROW")) {
 				this.x += speed;
-			if (this.isDown("RIGHT_ARROW"))
+				this.useMovementPoints(false);
+			}
+			if (this.isDown("RIGHT_ARROW")) {
 				this.x -= speed;
-			if (this.isDown("UP_ARROW"))
+				this.useMovementPoints(false);
+			}
+			if (this.isDown("UP_ARROW")) {
 				this.y += speed;
-			if (this.isDown("DOWN_ARROW"))
+				this.useMovementPoints(false);
+			}
+			if (this.isDown("DOWN_ARROW")) {
 				this.y -= speed;
+				this.useMovementPoints(false);
+			}
 		}).onHit('PlayerCharacterRight', function() {
-			if(currentScene == 'game')
+			if (currentScene == 'game') {
 				loadHighscore();
+			}
+
 		}).onHit('MenuStart', function() {
 			startGame();
 		}).onHit('MenuHighscore', function() {
@@ -157,9 +182,14 @@ Crafty.c('PlayerCharacterLeft', {
 		});
 	},
 
-	useMovementPoints : function() {
-		Crafty("PlayerCharacterRight").addMovementPoints();
-		this.movementPoints -= 1;
+	useMovementPoints : function(moved) {
+		if(moved){
+			Crafty("PlayerCharacterRight").addMovementPoints();
+			this.decreaseMovementPoints();
+		}else{
+			Crafty("PlayerCharacterRight").decreaseMovementPoints();
+			this.addMovementPoints();
+		}
 	},
 
 	getMovementPoints : function() {
@@ -170,6 +200,10 @@ Crafty.c('PlayerCharacterLeft', {
 		this.movementPoints += 1;
 	},
 	
+	decreaseMovementPoints : function() {
+		this.movementPoints -= 1;
+	},
+
 	setEnabled : function(enabled) {
 		this.enabled = enabled;
 	}
@@ -187,41 +221,50 @@ Crafty.c('PlayerCharacterRight', {
 			x : playerRightPosX,
 			y : playerRightPosY
 		}).bind('EnterFrame', function() {
-			if (this.getMovementPoints() > 0 && this.enabled) {		
+			if (this.getMovementPoints() > 0 && this.enabled) {
 
 				this.isMovementOK = false;
-				
+
 				if (this.isDown("A")) {
 					this.x -= speed;
-					this.useMovementPoints();					
+					this.useMovementPoints(true);
 				}
 				if (this.isDown("D")) {
 					this.x += speed;
-					this.useMovementPoints();
+					this.useMovementPoints(true);
 				}
 				if (this.isDown("W")) {
 					this.y -= speed;
-					this.useMovementPoints();
+					this.useMovementPoints(true);
 				}
 				if (this.isDown("S")) {
 					this.y += speed;
-					this.useMovementPoints();
+					this.useMovementPoints(true);
 				}
 			}
-		}).onHit('Solid', function(ent) {			
-			if (ent[0].obj.__c.Wall)
+		}).onHit('Solid', function(ent) {
+			/*if (ent[0].obj.__c.Wall)
 				console.debug('Wall');
 			else
 				console.debug('Solid');
-
-			if (this.isDown("A"))
+			 */
+			if (this.isDown("A")){
 				this.x += speed;
-			if (this.isDown("D"))
+				this.useMovementPoints(false);
+			}
+				
+			if (this.isDown("D")){
 				this.x -= speed;
-			if (this.isDown("W"))
+				this.useMovementPoints(false);
+			}
+			if (this.isDown("W")){
 				this.y += speed;
-			if (this.isDown("S"))
+				this.useMovementPoints(false);
+			}
+			if (this.isDown("S")){
 				this.y -= speed;
+				this.useMovementPoints(false);
+			}
 		}).onHit('MenuStart', function() {
 			startGame();
 		}).onHit('MenuHighscore', function() {
@@ -229,9 +272,14 @@ Crafty.c('PlayerCharacterRight', {
 		});
 	},
 
-	useMovementPoints : function() {
-		Crafty("PlayerCharacterLeft").addMovementPoints();
-		this.movementPoints -= 1;
+	useMovementPoints : function(moved) {
+		if(moved){
+			Crafty("PlayerCharacterLeft").addMovementPoints();
+			this.decreaseMovementPoints();
+		}else{
+			Crafty("PlayerCharacterLeft").decreaseMovementPoints();
+			this.addMovementPoints();
+		}
 	},
 
 	getMovementPoints : function() {
@@ -242,6 +290,9 @@ Crafty.c('PlayerCharacterRight', {
 		this.movementPoints += 1;
 	},
 	
+	decreaseMovementPoints : function() {
+		this.movementPoints -= 1;
+	},
 	setEnabled : function(enabled) {
 		this.enabled = enabled;
 	}

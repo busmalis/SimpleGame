@@ -3,8 +3,6 @@ var screenHeight = 400;
 var obstacles = 30;
 var currentScene;
 var timer;
-var bestTime;
-var currentTime;
 var newRecord;
 var playerRight;
 var playerLeft;
@@ -16,12 +14,9 @@ Crafty.background('#FFFFFF');
 Crafty.defineScene("menu", function() {
 	currentScene = "menu";
 	Crafty.background("#FFFFFF");
-	
-	// Get Storage values
-	// Crafty.storage.remove('bestTime');
-	bestTime = Crafty.storage('bestTime');
-	if (!bestTime)
-		bestTime = "1000";
+
+	// Set Storage values
+	setBestTime(getBestTime());
 
 	// Add characters
 	Crafty.e('PlayerCharacterRight').setEnabled(true);
@@ -53,14 +48,14 @@ Crafty.defineScene("menu", function() {
 Crafty.defineScene("game", function() {
 	currentScene = "game";
 	Crafty.background("#FFFFFF");
-	Crafty.timer.FPS(100);
+	Crafty.timer.FPS(50);
 
 	timer = Crafty.e('Timer');
 
 	// Add characters
 	playerRight = Crafty.e('PlayerCharacterRight');
 	playerLeft = Crafty.e('PlayerCharacterLeft');
-	
+
 	// Create border
 	for (var x = 0; x < screenWidth; x++) {
 		for (var y = 0; y < screenHeight; y++) {
@@ -190,20 +185,25 @@ Crafty.defineScene("game", function() {
 });
 
 Crafty.defineScene("highscore", function() {
-	currentScene = "hightscore";
+	currentScene = "highscore";
 	Crafty.background("#FFFFFF");
 
 	// Continue
 	Crafty.e('RibbonContinue');
 
+	// Reset Highscore
+	Crafty.e('RibbonResetHighScore');
+
 	// CURRENT TIME
-	if (currentTime) {
+	time = getCurrentTime();
+	
+	if (time) {
 		Crafty.e("2D, DOM, Text").attr({
 			w : screenWidth,
 			h : 50,
 			x : 0,
 			y : ((screenHeight / 2) - 50),
-		}).text("TIME: " + currentTime).css({
+		}).text("TIME: " + time).css({
 			"text-align" : "center"
 		}).textColor("#000000").textFont({
 			size : '20px',
@@ -231,14 +231,21 @@ Crafty.defineScene("highscore", function() {
 		h : 50,
 		x : 0,
 		y : ((screenHeight / 2)),
-	}).text("BEST TIME : " + bestTime).css({
+	}).text("BEST TIME : " + getBestTime()).css({
 		"text-align" : "center"
 	}).textColor("#000000").textFont({
 		size : '40px',
 		weight : 'bold'
 	}).bind('KeyDown', function(e) {
-		if (e.key == 67) // "C"
-			loadScene("menu", 500);
+		switch (e.key) {
+			case 67: // "C"
+				loadScene("menu", 200);
+				break;
+			case 82:
+				resetHighscore();
+				loadHighscore();
+				break;
+		}
 	});
 });
 
@@ -288,26 +295,27 @@ function loadScene(scene, duration) {
 }
 
 function loadHighscore() {
-	
-	currentTime = 0;
+
+	setCurrentTime(0);
 
 	if (currentScene == "game") {
 		timer.stopTimer();
-		currentTime = timer.getTime();
-		if (bestTime >= currentTime) {
-			bestTime = currentTime;
-			Crafty.storage('bestTime', bestTime);
+		setCurrentTime(timer.getTime());
+		if (getBestTime() >= getCurrentTime()) {
+			setBestTime(getCurrentTime());
 			newRecord = true;
 		} else {
 			newRecord = false;
 		}
+	} else {
+		newRecord = false;
 	}
 
-	loadScene("highscore", 500);
+	loadScene("highscore", 0);
 }
 
 function startGame() {
-	loadScene("game", 500);
+	loadScene("game", 200);
 }
 
 function getNewRecord() {
@@ -318,4 +326,28 @@ function start() {
 	timer.startTimer();
 	playerRight.setEnabled(true);
 	playerLeft.setEnabled(true);
+}
+
+function setBestTime(time) {
+	Crafty.storage('bestTime', time);
+}
+
+function getBestTime() {
+	var time = Crafty.storage('bestTime');
+	if (!time)
+		time = "1000";
+
+	return time;
+}
+
+function resetHighscore() {
+	Crafty.storage.remove('bestTime');
+}
+
+function getCurrentTime() {
+	return Crafty.storage('currentTime');
+}
+
+function setCurrentTime(time) {
+	Crafty.storage('currentTime', time);
 }
