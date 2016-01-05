@@ -283,7 +283,7 @@ Crafty.defineScene("highscore", function() {
 	});
 });
 
-loadScene("splash", 500);
+loadScene("splash", 1000);
 
 function loadScene(scene, duration) {
 
@@ -302,17 +302,32 @@ function loadScene(scene, duration) {
 			this.tween({
 				alpha : 0.0
 			}, duration).bind("TweenEnd", function() {
-				Crafty.load(assetsObj, // preload assets
-						function() { // when loaded
-							Crafty.enterScene('menu');
-						},
-						function(e) { // progress
-							console.debug(e.percent + '%');
-						},
+				Crafty.e("2D, Canvas, Tween, Color, Image").attr({
+					alpha : 0.0,
+					x : ((screenWidth / 2) - 150),
+					y : ((screenHeight / 2) - 50),
+					w : 300,
+					h : 100
+				}).image("assets/logo.png", "no-repeat").tween({
+					alpha : 1.0
+				}, duration).bind("TweenEnd", function() {
+					this.unbind("TweenEnd");
+					this.tween({
+						alpha : 0.0
+					}, duration).bind("TweenEnd", function() {
+						Crafty.load(assetsObj, // preload assets
+								function() { // when loaded
+									Crafty.enterScene('menu');
+								},
+								function(e) { // progress
+									console.debug(e.percent + '%');
+								},
 
-						function(e) { // uh oh, error loading
-							console.debug(e);
-						});
+								function(e) { // uh oh, error loading
+									console.debug(e);
+								});
+					});
+				});
 			});
 		});
 		break;
