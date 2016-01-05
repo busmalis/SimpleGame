@@ -76,11 +76,11 @@ Crafty.c('RibbonResetHighScore', {
 
 Crafty.c('MenuStart', {
 	init : function() {
-		this.requires('2D, Canvas, Color, Text').color('rgb(255, 255, 0)')
+		this.requires('2D, Canvas, Color, Text').color('rgb(255, 255, 255)')
 				.attr({
 					w : 100,
 					h : 30,
-					x : 200,
+					x : 50,
 					y : 100
 				}).text("START").textFont({
 					size : '40px',
@@ -91,11 +91,11 @@ Crafty.c('MenuStart', {
 
 Crafty.c('MenuHighscore', {
 	init : function() {
-		this.requires('2D, Canvas, Color, Text').color('rgb(255, 255, 0)')
+		this.requires('2D, Canvas, Color, Text').color('rgb(255, 255, 255)')
 				.attr({
 					w : 100,
 					h : 30,
-					x : 200,
+					x : 500,
 					y : 150
 				}).text("HIGHSCORE").textFont({
 					size : '40px',
@@ -149,11 +149,12 @@ Crafty.c('PlayerCharacterLeft', {
 
 			}
 		}).onHit('Solid', function(ent) {
-			/*if (ent[0].obj.__c.Wall)
-				console.debug('Wall');
-			else
-				console.debug('Solid');
-			 */
+			//if (ent[0].obj.__c.Wall)
+				playSound('wallHitSound');
+			//console.debug('Wall');
+			//else
+			//	console.debug('Solid');
+			 
 			if (this.isDown("LEFT_ARROW")) {
 				this.x += speed;
 				this.useMovementPoints(false);
@@ -243,6 +244,7 @@ Crafty.c('PlayerCharacterRight', {
 				}
 			}
 		}).onHit('Solid', function(ent) {
+			playSound('wallHitSound');
 			/*if (ent[0].obj.__c.Wall)
 				console.debug('Wall');
 			else

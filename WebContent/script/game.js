@@ -7,9 +7,35 @@ var newRecord;
 var playerRight;
 var playerLeft;
 
+setup();
+
+/*
+ * Audio: http://www.musicradar.com/news/tech/sampleradar-627132
+ */
+
+Crafty.paths({ audio: "assets/sounds/", images: "assets/images/" });
+
 Crafty.init(screenWidth, screenHeight, document.getElementById("game"));
 
 Crafty.background('#FFFFFF');
+
+var assetsObj = {
+	"audio" : {
+		"backgroundGameMusic" : [ "CS_FMArp A_110-E.wav" ],
+		"countDownSound" : [ "CS_Noise D-16.wav"],
+		"wallHitSound" : [ "CS_Noise B-06.wav" ],
+		"highScorePositive" : [ "CS_VocoBitA_Noise-06.wav"],
+		"highScoreNegative" : [ "CS_VocoBitA_Noise-05.wav"]
+		
+	}/*,
+	"images" :  [ ".png"]*/
+/*
+ * "sprites": { "animals.png": { "tile": 50, "tileh": 40, "map": { "ladybug":
+ * [0,0], "lazycat": [0,1], "ferociousdog": [0,2] } "paddingX": 5, "paddingY":
+ * 5, "paddingAroundBorder": 10 }, "vehicles.png": { "tile": 150, "tileh": 75,
+ * "map": { "car": [0,0], "truck": [0,1] } } },
+ */
+};
 
 Crafty.defineScene("menu", function() {
 	currentScene = "menu";
@@ -101,6 +127,7 @@ Crafty.defineScene("game", function() {
 		});
 	}
 
+	playSound("countDownSound");
 	Crafty.e("2D, DOM, Canvas, Tween, Text").attr({
 		alpha : 0.0,
 		x : ((screenWidth / 2) - 85),
@@ -114,11 +141,12 @@ Crafty.defineScene("game", function() {
 		weight : 'bold'
 	}).tween({
 		alpha : 1.0
-	}, 500).bind("TweenEnd", function() {
+	}, 1000).bind("TweenEnd", function() {
 		this.unbind("TweenEnd");
 		this.tween({
 			alpha : 0.0
-		}, 500).bind("TweenEnd", function() {
+		}, 200).bind("TweenEnd", function() {
+			playSound("countDownSound");
 			Crafty.e("2D, DOM, Canvas, Tween, Text").attr({
 				alpha : 0.0,
 				x : ((screenWidth / 2) - 85),
@@ -132,11 +160,12 @@ Crafty.defineScene("game", function() {
 				weight : 'bold'
 			}).tween({
 				alpha : 1.0
-			}, 500).bind("TweenEnd", function() {
+			}, 1000).bind("TweenEnd", function() {
 				this.unbind("TweenEnd");
 				this.tween({
 					alpha : 0.0
-				}, 500).bind("TweenEnd", function() {
+				}, 200).bind("TweenEnd", function() {
+					playSound("countDownSound");
 					Crafty.e("2D, DOM, Canvas, Tween, Text").attr({
 						alpha : 0.0,
 						x : ((screenWidth / 2) - 85),
@@ -150,11 +179,12 @@ Crafty.defineScene("game", function() {
 						weight : 'bold'
 					}).tween({
 						alpha : 1.0
-					}, 500).bind("TweenEnd", function() {
+					}, 1000).bind("TweenEnd", function() {
 						this.unbind("TweenEnd");
 						this.tween({
 							alpha : 0.0
-						}, 500).bind("TweenEnd", function() {
+						}, 200).bind("TweenEnd", function() {
+							playSound("countDownSound");
 							Crafty.e("2D, DOM, Canvas, Tween, Text").attr({
 								alpha : 0.0,
 								x : ((screenWidth / 2) - 200),
@@ -168,11 +198,12 @@ Crafty.defineScene("game", function() {
 								weight : 'bold'
 							}).tween({
 								alpha : 1.0
-							}, 500).bind("TweenEnd", function() {
+							}, 1000).bind("TweenEnd", function() {
 								this.unbind("TweenEnd");
 								this.tween({
 									alpha : 0.0
-								}, 500).bind("TweenEnd", function() {
+								}, 200).bind("TweenEnd", function() {
+									playSound("countDownSound");
 									start();
 								});
 							})
@@ -196,7 +227,7 @@ Crafty.defineScene("highscore", function() {
 
 	// CURRENT TIME
 	time = getCurrentTime();
-	
+
 	if (time) {
 		Crafty.e("2D, DOM, Text").attr({
 			w : screenWidth,
@@ -223,6 +254,9 @@ Crafty.defineScene("highscore", function() {
 				size : '40px',
 				weight : 'bold'
 			});
+			playSound('highScorePositive');
+		}else{
+			playSound('highScoreNegative');
 		}
 	}
 
@@ -238,13 +272,13 @@ Crafty.defineScene("highscore", function() {
 		weight : 'bold'
 	}).bind('KeyDown', function(e) {
 		switch (e.key) {
-			case 67: // "C"
-				loadScene("menu", 200);
-				break;
-			case 82:
-				resetHighscore();
-				loadHighscore();
-				break;
+		case 67: // "C"
+			loadScene("menu", 200);
+			break;
+		case 82:
+			resetHighscore();
+			loadHighscore();
+			break;
 		}
 	});
 });
@@ -268,7 +302,17 @@ function loadScene(scene, duration) {
 			this.tween({
 				alpha : 0.0
 			}, duration).bind("TweenEnd", function() {
-				Crafty.enterScene('menu');
+				Crafty.load(assetsObj, // preload assets
+						function() { // when loaded
+							Crafty.enterScene('menu');
+						},
+						function(e) { // progress
+							console.debug(e.percent + '%');
+						},
+
+						function(e) { // uh oh, error loading
+							console.debug(e);
+						});
 			});
 		});
 		break;
@@ -300,6 +344,7 @@ function loadHighscore() {
 
 	if (currentScene == "game") {
 		timer.stopTimer();
+		stopMusic();
 		setCurrentTime(timer.getTime());
 		if (getBestTime() >= getCurrentTime()) {
 			setBestTime(getCurrentTime());
@@ -324,6 +369,7 @@ function getNewRecord() {
 
 function start() {
 	timer.startTimer();
+	startMusic();
 	playerRight.setEnabled(true);
 	playerLeft.setEnabled(true);
 }
@@ -350,4 +396,30 @@ function getCurrentTime() {
 
 function setCurrentTime(time) {
 	Crafty.storage('currentTime', time);
+}
+
+function startMusic() {
+	switch (currentScene) {
+	case 'game':
+		Crafty.audio.play("backgroundGameMusic", -1, 0.2); // Play the audio
+															// file
+		break;
+	}
+}
+
+function stopMusic() {
+	Crafty.audio.stop();	
+}
+
+function playSound(sound) {
+	Crafty.audio.play(sound,1,0.2);
+}
+
+function setup() {
+	window.addEventListener("keydown", function(e) {
+	    // space and arrow keys
+	    if([32, 37, 38, 39, 40].indexOf(e.keyCode) > -1) {
+	        e.preventDefault();
+	    }
+	}, false);
 }
