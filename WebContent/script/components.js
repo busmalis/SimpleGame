@@ -1,9 +1,9 @@
 var objectWidth = 16;
 var objectHeight = 16;
-var playerLeftPosX = 30;
-var playerLeftPosY = 200;
-var playerRightPosX = 750;
-var playerRightPosY = 200;
+var blockLeftPosX = 30;
+var blockLeftPosY = 200;
+var blockRightPosX = 750;
+var blockRightPosY = 200;
 var movementPoints = 50;
 var speed = 3;
 
@@ -15,7 +15,6 @@ Crafty.c('Timer', {
 			x : 20,
 			y : 20
 		}).text(0).bind('EnterFrame', function(ent) {
-			// if (ent.frame % 60 == 0) {
 			if (this.run) {
 				this.setTime();
 			} else if (!this.run)
@@ -116,8 +115,8 @@ Crafty.c('Wall', {
 	}
 });
 
-// This is the player-controlled character
-Crafty.c('PlayerCharacterLeft', {
+// This is the left block controlled character
+Crafty.c('BlockLeft', {
 	movementPoints : movementPoints,
 	enabled : false,
 	init : function() {
@@ -125,8 +124,8 @@ Crafty.c('PlayerCharacterLeft', {
 				'rgb(255, 0, 0)').attr({
 			w : objectWidth,
 			h : objectHeight,
-			x : playerLeftPosX,
-			y : playerLeftPosY
+			x : blockLeftPosX,
+			y : blockLeftPosY
 		}).bind('EnterFrame', function() {
 			if (this.getMovementPoints() > 0 && this.enabled) {
 
@@ -149,11 +148,7 @@ Crafty.c('PlayerCharacterLeft', {
 
 			}
 		}).onHit('Solid', function(ent) {
-			//if (ent[0].obj.__c.Wall)
-				playSound('wallHitSound');
-			//console.debug('Wall');
-			//else
-			//	console.debug('Solid');
+			playSound('wallHitSound');
 			 
 			if (this.isDown("LEFT_ARROW")) {
 				this.x += speed;
@@ -171,7 +166,7 @@ Crafty.c('PlayerCharacterLeft', {
 				this.y -= speed;
 				this.useMovementPoints(false);
 			}
-		}).onHit('PlayerCharacterRight', function() {
+		}).onHit('BlockRight', function() {
 			if (currentScene == 'game') {
 				loadHighscore();
 			}
@@ -185,10 +180,10 @@ Crafty.c('PlayerCharacterLeft', {
 
 	useMovementPoints : function(moved) {
 		if(moved){
-			Crafty("PlayerCharacterRight").addMovementPoints();
+			Crafty("BlockRight").addMovementPoints();
 			this.decreaseMovementPoints();
 		}else{
-			Crafty("PlayerCharacterRight").decreaseMovementPoints();
+			Crafty("BlockRight").decreaseMovementPoints();
 			this.addMovementPoints();
 		}
 	},
@@ -210,8 +205,8 @@ Crafty.c('PlayerCharacterLeft', {
 	}
 });
 
-// This is the player-controlled character
-Crafty.c('PlayerCharacterRight', {
+// This is the right block controlled character
+Crafty.c('BlockRight', {
 	movementPoints : movementPoints,
 	enabled : false,
 	init : function() {
@@ -219,8 +214,8 @@ Crafty.c('PlayerCharacterRight', {
 				'rgb(0, 40, 255)').attr({
 			w : objectWidth,
 			h : objectHeight,
-			x : playerRightPosX,
-			y : playerRightPosY
+			x : blockRightPosX,
+			y : blockRightPosY
 		}).bind('EnterFrame', function() {
 			if (this.getMovementPoints() > 0 && this.enabled) {
 
@@ -245,11 +240,7 @@ Crafty.c('PlayerCharacterRight', {
 			}
 		}).onHit('Solid', function(ent) {
 			playSound('wallHitSound');
-			/*if (ent[0].obj.__c.Wall)
-				console.debug('Wall');
-			else
-				console.debug('Solid');
-			 */
+			
 			if (this.isDown("A")){
 				this.x += speed;
 				this.useMovementPoints(false);
@@ -276,10 +267,10 @@ Crafty.c('PlayerCharacterRight', {
 
 	useMovementPoints : function(moved) {
 		if(moved){
-			Crafty("PlayerCharacterLeft").addMovementPoints();
+			Crafty("BlockLeft").addMovementPoints();
 			this.decreaseMovementPoints();
 		}else{
-			Crafty("PlayerCharacterLeft").decreaseMovementPoints();
+			Crafty("BlockLeft").decreaseMovementPoints();
 			this.addMovementPoints();
 		}
 	},
@@ -295,6 +286,7 @@ Crafty.c('PlayerCharacterRight', {
 	decreaseMovementPoints : function() {
 		this.movementPoints -= 1;
 	},
+	
 	setEnabled : function(enabled) {
 		this.enabled = enabled;
 	}

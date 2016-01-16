@@ -1,11 +1,12 @@
 var screenWidth = 800;
 var screenHeight = 400;
 var obstacles = 30;
+var splashLoadtime = 1000;
 var currentScene;
 var timer;
 var newRecord;
 var playerRight;
-var playerLeft;
+var blockLeft;
 
 setup();
 
@@ -19,6 +20,8 @@ Crafty.init(screenWidth, screenHeight, document.getElementById("game"));
 
 Crafty.background('#FFFFFF');
 
+Crafty.timer.FPS(50);
+
 var assetsObj = {
 	"audio" : {
 		"backgroundGameMusic" : [ "CS_FMArp A_110-E.wav" ],
@@ -27,41 +30,20 @@ var assetsObj = {
 		"highScorePositive" : [ "CS_VocoBitA_Noise-06.wav"],
 		"highScoreNegative" : [ "CS_VocoBitA_Noise-05.wav"]
 		
-	}/*,
-	"images" :  [ ".png"]*/
-/*
- * "sprites": { "animals.png": { "tile": 50, "tileh": 40, "map": { "ladybug":
- * [0,0], "lazycat": [0,1], "ferociousdog": [0,2] } "paddingX": 5, "paddingY":
- * 5, "paddingAroundBorder": 10 }, "vehicles.png": { "tile": 150, "tileh": 75,
- * "map": { "car": [0,0], "truck": [0,1] } } },
- */
+	}
 };
 
 Crafty.defineScene("menu", function() {
 	currentScene = "menu";
-	Crafty.background("#FFFFFF");
 
 	// Set Storage values
 	setBestTime(getBestTime());
 
 	// Add characters
-	Crafty.e('PlayerCharacterRight').setEnabled(true);
-	Crafty.e('PlayerCharacterLeft').setEnabled(true);
+	createBlocks(true);
 
 	// Create border
-	for (var x = 0; x < screenWidth; x++) {
-		for (var y = 0; y < screenHeight; y++) {
-			if (x == 0 || x == screenWidth - 16 || y == 0
-					|| y == screenHeight - 16) {
-				Crafty.e('Wall').attr({
-					w : 16,
-					h : 16,
-					x : x,
-					y : y
-				});
-			}
-		}
-	}
+	createBorder();
 
 	// Start
 	Crafty.e('MenuStart');
@@ -73,151 +55,22 @@ Crafty.defineScene("menu", function() {
 
 Crafty.defineScene("game", function() {
 	currentScene = "game";
-	Crafty.background("#FFFFFF");
-	Crafty.timer.FPS(50);
 
 	timer = Crafty.e('Timer');
-
-	// Add characters
-	playerRight = Crafty.e('PlayerCharacterRight');
-	playerLeft = Crafty.e('PlayerCharacterLeft');
-
+	
 	// Create border
-	for (var x = 0; x < screenWidth; x++) {
-		for (var y = 0; y < screenHeight; y++) {
-			if (x == 0 || x == screenWidth - 16 || y == 0
-					|| y == screenHeight - 16) {
-				Crafty.e('Wall').attr({
-					w : 16,
-					h : 16,
-					x : x,
-					y : y
-				});
-			}
-		}
-	}
+	createBorder();
 
 	// Create obstacles
-	for (var x = 0; x < obstacles; x++) {
-		Crafty.e('Wall').attr({
-			w : 16,
-			h : 16,
-			x : 100 + Math.floor((Math.random() * (screenWidth - 200)) + 1),
-			y : 20 + Math.floor((Math.random() * (screenHeight / 3)) + 1)
-		});
-	}
+	createObstacles();
 
-	// Create obstacles
-	for (var x = 0; x < obstacles; x++) {
-		Crafty.e('Wall').attr({
-			w : 16,
-			h : 16,
-			x : 100 + Math.floor((Math.random() * (screenWidth - 200)) + 1),
-			y : 100 + Math.floor((Math.random() * (screenHeight / 3)) + 1)
-		});
-	}
-
-	// Create obstacles
-	for (var x = 0; x < obstacles; x++) {
-		Crafty.e('Wall').attr({
-			w : 16,
-			h : 16,
-			x : 100 + Math.floor((Math.random() * (screenWidth - 200)) + 1),
-			y : 230 + Math.floor((Math.random() * (screenHeight / 3)) + 1)
-		});
-	}
-
-	playSound("countDownSound");
-	Crafty.e("2D, DOM, Canvas, Tween, Text").attr({
-		alpha : 0.0,
-		x : ((screenWidth / 2) - 85),
-		y : ((screenHeight / 2) - 30),
-		w : 170,
-		h : 60
-	}).text("3").css({
-		"text-align" : "center"
-	}).textColor("#000000").textFont({
-		size : '80px',
-		weight : 'bold'
-	}).tween({
-		alpha : 1.0
-	}, 1000).bind("TweenEnd", function() {
-		this.unbind("TweenEnd");
-		this.tween({
-			alpha : 0.0
-		}, 200).bind("TweenEnd", function() {
-			playSound("countDownSound");
-			Crafty.e("2D, DOM, Canvas, Tween, Text").attr({
-				alpha : 0.0,
-				x : ((screenWidth / 2) - 85),
-				y : ((screenHeight / 2) - 30),
-				w : 170,
-				h : 60
-			}).text("2").css({
-				"text-align" : "center"
-			}).textColor("#000000").textFont({
-				size : '80px',
-				weight : 'bold'
-			}).tween({
-				alpha : 1.0
-			}, 1000).bind("TweenEnd", function() {
-				this.unbind("TweenEnd");
-				this.tween({
-					alpha : 0.0
-				}, 200).bind("TweenEnd", function() {
-					playSound("countDownSound");
-					Crafty.e("2D, DOM, Canvas, Tween, Text").attr({
-						alpha : 0.0,
-						x : ((screenWidth / 2) - 85),
-						y : ((screenHeight / 2) - 30),
-						w : 170,
-						h : 60
-					}).text("1").css({
-						"text-align" : "center"
-					}).textColor("#000000").textFont({
-						size : '80px',
-						weight : 'bold'
-					}).tween({
-						alpha : 1.0
-					}, 1000).bind("TweenEnd", function() {
-						this.unbind("TweenEnd");
-						this.tween({
-							alpha : 0.0
-						}, 200).bind("TweenEnd", function() {
-							playSound("countDownSound");
-							Crafty.e("2D, DOM, Canvas, Tween, Text").attr({
-								alpha : 0.0,
-								x : ((screenWidth / 2) - 200),
-								y : ((screenHeight / 2) - 30),
-								w : 170,
-								h : 60
-							}).text("START").css({
-								"text-align" : "center"
-							}).textColor("#000000").textFont({
-								size : '80px',
-								weight : 'bold'
-							}).tween({
-								alpha : 1.0
-							}, 1000).bind("TweenEnd", function() {
-								this.unbind("TweenEnd");
-								this.tween({
-									alpha : 0.0
-								}, 200).bind("TweenEnd", function() {
-									playSound("countDownSound");
-									start();
-								});
-							})
-						});
-					})
-				});
-			})
-		});
-	});
+	// Create Countdown
+	createCountdown();
+	
 });
 
 Crafty.defineScene("highscore", function() {
 	currentScene = "highscore";
-	Crafty.background("#FFFFFF");
 
 	// Continue
 	Crafty.e('RibbonContinue');
@@ -225,7 +78,7 @@ Crafty.defineScene("highscore", function() {
 	// Reset Highscore
 	Crafty.e('RibbonResetHighScore');
 
-	// CURRENT TIME
+	// Create Timer
 	time = getCurrentTime();
 
 	if (time) {
@@ -283,7 +136,7 @@ Crafty.defineScene("highscore", function() {
 	});
 });
 
-loadScene("splash", 1000);
+loadScene("splash", splashLoadtime);
 
 function loadScene(scene, duration) {
 
@@ -385,8 +238,7 @@ function getNewRecord() {
 function start() {
 	timer.startTimer();
 	startMusic();
-	playerRight.setEnabled(true);
-	playerLeft.setEnabled(true);
+	createBlocks(true);
 }
 
 function setBestTime(time) {
@@ -437,4 +289,144 @@ function setup() {
 	        e.preventDefault();
 	    }
 	}, false);
+}
+
+function createBlocks(enabled){
+	blockRight = Crafty.e('BlockRight').setEnabled(enabled);
+	playerLeft = Crafty.e('BlockLeft').setEnabled(enabled);
+}
+
+function createBorder(){
+	for (var x = 0; x < screenWidth; x++) {
+		for (var y = 0; y < screenHeight; y++) {
+			if (x == 0 || x == screenWidth - 16 || y == 0
+					|| y == screenHeight - 16) {
+				Crafty.e('Wall').attr({
+					w : 16,
+					h : 16,
+					x : x,
+					y : y
+				});
+			}
+		}
+	}
+}
+
+function createObstacles(){
+	for (var x = 0; x < obstacles; x++) {
+		Crafty.e('Wall').attr({
+			w : 16,
+			h : 16,
+			x : 100 + Math.floor((Math.random() * (screenWidth - 200)) + 1),
+			y : 20 + Math.floor((Math.random() * (screenHeight / 3)) + 1)
+		});
+	}
+
+	
+	for (var x = 0; x < obstacles; x++) {
+		Crafty.e('Wall').attr({
+			w : 16,
+			h : 16,
+			x : 100 + Math.floor((Math.random() * (screenWidth - 200)) + 1),
+			y : 100 + Math.floor((Math.random() * (screenHeight / 3)) + 1)
+		});
+	}
+
+	for (var x = 0; x < obstacles; x++) {
+		Crafty.e('Wall').attr({
+			w : 16,
+			h : 16,
+			x : 100 + Math.floor((Math.random() * (screenWidth - 200)) + 1),
+			y : 230 + Math.floor((Math.random() * (screenHeight / 3)) + 1)
+		});
+	}
+}
+
+function createCountdown(){
+	playSound("countDownSound");
+	Crafty.e("2D, DOM, Canvas, Tween, Text").attr({
+		alpha : 0.0,
+		x : ((screenWidth / 2) - 85),
+		y : ((screenHeight / 2) - 30),
+		w : 170,
+		h : 60
+	}).text("3").css({
+		"text-align" : "center"
+	}).textColor("#000000").textFont({
+		size : '80px',
+		weight : 'bold'
+	}).tween({
+		alpha : 1.0
+	}, 1000).bind("TweenEnd", function() {
+		this.unbind("TweenEnd");
+		this.tween({
+			alpha : 0.0
+		}, 200).bind("TweenEnd", function() {
+			playSound("countDownSound");
+			Crafty.e("2D, DOM, Canvas, Tween, Text").attr({
+				alpha : 0.0,
+				x : ((screenWidth / 2) - 85),
+				y : ((screenHeight / 2) - 30),
+				w : 170,
+				h : 60
+			}).text("2").css({
+				"text-align" : "center"
+			}).textColor("#000000").textFont({
+				size : '80px',
+				weight : 'bold'
+			}).tween({
+				alpha : 1.0
+			}, 1000).bind("TweenEnd", function() {
+				this.unbind("TweenEnd");
+				this.tween({
+					alpha : 0.0
+				}, 200).bind("TweenEnd", function() {
+					playSound("countDownSound");
+					Crafty.e("2D, DOM, Canvas, Tween, Text").attr({
+						alpha : 0.0,
+						x : ((screenWidth / 2) - 85),
+						y : ((screenHeight / 2) - 30),
+						w : 170,
+						h : 60
+					}).text("1").css({
+						"text-align" : "center"
+					}).textColor("#000000").textFont({
+						size : '80px',
+						weight : 'bold'
+					}).tween({
+						alpha : 1.0
+					}, 1000).bind("TweenEnd", function() {
+						this.unbind("TweenEnd");
+						this.tween({
+							alpha : 0.0
+						}, 200).bind("TweenEnd", function() {
+							playSound("countDownSound");
+							Crafty.e("2D, DOM, Canvas, Tween, Text").attr({
+								alpha : 0.0,
+								x : ((screenWidth / 2) - 200),
+								y : ((screenHeight / 2) - 30),
+								w : 170,
+								h : 60
+							}).text("START").css({
+								"text-align" : "center"
+							}).textColor("#000000").textFont({
+								size : '80px',
+								weight : 'bold'
+							}).tween({
+								alpha : 1.0
+							}, 1000).bind("TweenEnd", function() {
+								this.unbind("TweenEnd");
+								this.tween({
+									alpha : 0.0
+								}, 200).bind("TweenEnd", function() {
+									playSound("countDownSound");
+									start();
+								});
+							})
+						});
+					})
+				});
+			})
+		});
+	});
 }
