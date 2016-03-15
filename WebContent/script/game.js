@@ -1,12 +1,14 @@
 var screenWidth = 800;
-var screenHeight = 400;
+var screenHeight = 500;
 var obstacles = 30;
-var splashLoadtime = 1000;
+var splashLoadtime = 100; //1000;
 var currentScene;
 var timer;
 var newRecord;
 var playerRight;
 var blockLeft;
+var powerbarLeft;
+var powerbarRight;
 
 setup();
 
@@ -294,12 +296,15 @@ function setup() {
 function createBlocks(enabled){
 	blockRight = Crafty.e('BlockRight').setEnabled(enabled);
 	playerLeft = Crafty.e('BlockLeft').setEnabled(enabled);
+	
+	powerbarLeft = Crafty.e('PowerbarLeft');
+	powerbarRight = Crafty.e('PowerbarRight');
 }
 
 function createBorder(){
 	for (var x = 0; x < screenWidth; x++) {
-		for (var y = 0; y < screenHeight; y++) {
-			if (x == 0 || x == screenWidth - 16 || y == 0
+		for (var y = 50; y < screenHeight; y++) {
+			if (x == 0 || x == screenWidth - 16 || y == 50
 					|| y == screenHeight - 16) {
 				Crafty.e('Wall').attr({
 					w : 16,
@@ -318,17 +323,16 @@ function createObstacles(){
 			w : 16,
 			h : 16,
 			x : 100 + Math.floor((Math.random() * (screenWidth - 200)) + 1),
-			y : 20 + Math.floor((Math.random() * (screenHeight / 3)) + 1)
+			y : 70 + Math.floor((Math.random() * (screenHeight / 3)) + 1)
 		});
 	}
-
 	
 	for (var x = 0; x < obstacles; x++) {
 		Crafty.e('Wall').attr({
 			w : 16,
 			h : 16,
 			x : 100 + Math.floor((Math.random() * (screenWidth - 200)) + 1),
-			y : 100 + Math.floor((Math.random() * (screenHeight / 3)) + 1)
+			y : 150 + Math.floor((Math.random() * (screenHeight / 3)) + 1)
 		});
 	}
 
@@ -337,7 +341,7 @@ function createObstacles(){
 			w : 16,
 			h : 16,
 			x : 100 + Math.floor((Math.random() * (screenWidth - 200)) + 1),
-			y : 230 + Math.floor((Math.random() * (screenHeight / 3)) + 1)
+			y : 280 + Math.floor((Math.random() * (screenHeight / 3)) + 1)
 		});
 	}
 }

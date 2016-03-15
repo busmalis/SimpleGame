@@ -2,8 +2,10 @@ var objectWidth = 16;
 var objectHeight = 16;
 var blockLeftPosX = 30;
 var blockLeftPosY = 200;
+var blockLeftColor = 'rgb(0, 0, 255)';
 var blockRightPosX = 750;
 var blockRightPosY = 200;
+var blockRightColor = 'rgb(255, 0, 0)';
 var movementPoints = 50;
 var speed = 3;
 
@@ -12,15 +14,15 @@ Crafty.c('Timer', {
 	run : false,
 	init : function() {
 		this.requires('2D, Canvas, Text').attr({
-			x : 20,
-			y : 20
+			x : 350,
+			y : 5
 		}).text(0).bind('EnterFrame', function(ent) {
 			if (this.run) {
 				this.setTime();
 			} else if (!this.run)
 				this.stopTimer();
 		}).textFont({
-			size : '20px',
+			size : '40px',
 			weight : 'bold'
 		});
 	},
@@ -41,7 +43,7 @@ Crafty.c('Timer', {
 	getTime : function() {
 		return this.time;
 	}
-}),
+});
 
 Crafty.c('RibbonContinue', {
 	init : function() {
@@ -115,13 +117,54 @@ Crafty.c('Wall', {
 	}
 });
 
+Crafty.c('Block', {
+	init : function() {
+		
+	}
+});
+
+Crafty.c('PowerbarLeft', {
+	init : function() {
+		this.requires('2D, Canvas, Color, Text').color(blockLeftColor)
+		.text("PowerBar").textFont({
+			size : '20px'
+		}).attr({
+			w : 200,
+			h : 50,
+			x : 0,
+			y : 0,				
+		});
+	},
+	
+	setWidth : function(value){
+		this.w = (200 / 100) * value;
+	}
+});
+
+Crafty.c('PowerbarRight', {	
+	init : function() {
+		this.requires('2D, Canvas, Color, Text').color(blockRightColor)
+		.text("PowerBar").textFont({
+			size : '20px'
+		}).attr({
+			w : 200,
+			h : 50,
+			x : 600,
+			y : 0,				
+		});
+	},
+	
+	setWidth : function(value){
+		this.w = (200 / 100) * value;
+	}
+});
+
 // This is the left block controlled character
 Crafty.c('BlockLeft', {
 	movementPoints : movementPoints,
 	enabled : false,
 	init : function() {
-		this.requires('Actor, Color, Collision, Multiway').color(
-				'rgb(255, 0, 0)').attr({
+		this.requires('Actor, Color, Collision, Multiway').color(blockLeftColor).attr({
 			w : objectWidth,
 			h : objectHeight,
 			x : blockLeftPosX,
@@ -189,6 +232,7 @@ Crafty.c('BlockLeft', {
 	},
 
 	getMovementPoints : function() {
+		Crafty("PowerbarLeft").setWidth(this.movementPoints);
 		return this.movementPoints;
 	},
 
@@ -210,8 +254,7 @@ Crafty.c('BlockRight', {
 	movementPoints : movementPoints,
 	enabled : false,
 	init : function() {
-		this.requires('Actor, Color, Collision, Multiway').color(
-				'rgb(0, 40, 255)').attr({
+		this.requires('Actor, Color, Collision, Multiway').color(blockRightColor).attr({
 			w : objectWidth,
 			h : objectHeight,
 			x : blockRightPosX,
@@ -276,6 +319,7 @@ Crafty.c('BlockRight', {
 	},
 
 	getMovementPoints : function() {
+		Crafty("PowerbarRight").setWidth(this.movementPoints);
 		return this.movementPoints;
 	},
 
